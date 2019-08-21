@@ -2,12 +2,12 @@ My Shell in UNIX
 ====================
 
 - - -
-![Alt text](/path/to/BackgroundJob&IOredirection.JPG)
-BackgroundJob & I/O Redirection
+![Background Job](BackgroundJob&IOredirection.JPG)
+BackgroundJob
 - - -
-![Alt text](/path/to/IOredirection.JPG)
+![I/O Redirection](IOredirection.JPG)
 I/O Redirection
 - - -
-![Alt text](/path/to/multiPIPE.JPG)
+![multipipe](multiPIPE.JPG)
 multiPIPE
 - - -
