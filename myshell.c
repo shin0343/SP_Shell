@@ -56,13 +56,11 @@ void forkExeOneCmd(char *fname)
     {
         cmd[cmdIdx] = cmdPtr; // 문자열을 자른 뒤 메모리 주소를 문자열 포인터 배열에 저장
         cmdIdx++;             // 인덱스 증가
-        //printf("cmd[i]: %s", cmd[cmdIdx]);
         cmdPtr = strtok(NULL, " "); // 다음 문자열을 잘라서 포인터를 반환
     }
     pathName = (char *)malloc(sizeof(char) * strlen(cmd[0]));
     strcpy(pathName, cmd[0]);
     ///// 입력 명령문 토큰화 완료 /////
-    //testCmdPrint(cmd, cmdIdx);
 
     execvp(pathName, cmd);
 
@@ -105,10 +103,6 @@ void pipeShellCmd(char *inputCmd)
     {
         pipe(pipeFd[i]);
     }
-    /*for (i = 0; i < pipeNums; i++)
-    {
-        printf("pipe[%d][0]=%d,pipe[%d][1]=%d\n", i, pipeFd[i][0], i, pipeFd[i][1]);
-    }*/
 
     ///// 파이프 |로 토큰화 시작 /////
     firstFileForPipe = strtok(inputCmd, "|");
@@ -116,12 +110,10 @@ void pipeShellCmd(char *inputCmd)
     {
         nextFileForPipe = strtok(NULL, "|");
 
-        //printf("CmdForPipe! = %s\n", firstFileForPipe);
         //처음 파트 명령 수행
         int child_pid0 = fork();
         if (child_pid0 == 0) //child
         {
-            //printf("파이프 점검 -----------------------------\n");
             ///// 입력 명령문 토큰화 시작 /////
             char *pathName = NULL;
             char *cmdPtr = NULL;
@@ -139,31 +131,20 @@ void pipeShellCmd(char *inputCmd)
             pathName = (char *)malloc(sizeof(char) * strlen(cmd[0]));
             strcpy(pathName, cmd[0]);
             ///// 입력 명령문 토큰화 완료 /////
-            //printf("정상 child: 명령어추출 완료!   pathName: %s \n", pathName);
-            //testCmdPrint(cmd, cmdIdx);
-            //printf("pipefd[%d]= %d,  pipefd[%d]= %d\n", pipeIdx - 2, pipeFd[pipeIdx - 2], pipeIdx + 1, pipeFd[pipeIdx + 1]);
+
             if (pipeIdx == 0)
             {
                 //첫번째 명령어
             }
             else //두번째 명령어부터
             {
-                /*if (pipeIdx > 0)
-                {
-                    char buffer[1024];
-                    memset(buffer, 0, 1024);
-                    read(pipeFd[(pipeIdx - 2)], buffer, 1024);
-                    printf("%s\n", buffer);
-                }*/
                 fclose(stdin);
                 dup(pipeFd[pipeIdx - 1][0]);
                 close(pipeFd[pipeIdx - 1][0]);
-                //printf("이전 명령어에서 받음 [%d]\n", pipeIdx - 2);
             }
 
             if (nextFileForPipe != NULL)
             {
-                //printf("다음 명령어에 전달 [%d]\n", pipeIdx + 1);
                 fclose(stdout);
                 dup(pipeFd[pipeIdx][1]);
                 close(pipeFd[pipeIdx][1]);
@@ -201,7 +182,6 @@ void pipeShellCmd(char *inputCmd)
     for (i = 0; i < pipeNums + 1; i++)
     {
         int pid = wait(&statusTmp);
-        //printf("child 종료---- pid:%d   status:%d \n", pid, statusTmp);
     }
     return;
 }
@@ -250,7 +230,6 @@ void normalShellCmd()
             exit(0);
         }
         strcpy(input_cmdBackUp, input_cmd); //명령어 원본 백업
-        //printf("입력 완료!");
 
         ///// 입력 명령문 토큰화 시작 /////
         cmdPtr = strtok(input_cmd, " ");
@@ -263,27 +242,11 @@ void normalShellCmd()
         pathName = (char *)malloc(sizeof(char) * strlen(cmd[0]));
         strcpy(pathName, cmd[0]);
         ///// 입력 명령문 토큰화 완료 /////
-        //printf("토큰화 완료! pathName: %s \n", pathName);
-        //testCmdPrint(cmd, cmdIdx);
 
         ///// 파이프 수행 처리
         int pipeNums = getPipeNums(input_cmdBackUp);
-        //printf("파이프 카운트수= %d___________________\n", pipeNums);
         if (pipeNums > 0)
         {
-            /*int child_pid_tmp = fork();
-            if (child_pid_tmp == 0)
-            {
-                pipeShellCmd(input_cmdBackUp);
-            }
-            else
-            {
-                //printf("파이프 수행 완료___________________\n");
-                //int pid = waitpid(child_pid_tmp, &status, waitVal);
-                //printf("pipeShellCmd 종료---- pid:%d   status:%d \n", pid, status);
-                waitpid(child_pid_tmp, &status, waitVal);
-            }*/
-            //sleep(1); //프롬프트를 제 위치에 띄우기 위함
             pipeShellCmd(input_cmdBackUp);
             continue;
         }
@@ -307,9 +270,8 @@ void normalShellCmd()
                     {
                         boundCmdIdx = i;
                     }
-                    //testCmdPrint(cmd, cmdIdx);
+
                     outFileName = cmd[i + 1];
-                    //printf("outFileName: %s\n", outFileName);
                     int outFileFd = open(outFileName, O_WRONLY | O_CREAT /*| O_TRUNC*/, 0644);
                     fclose(stdout);
                     dup(outFileFd);
@@ -321,9 +283,8 @@ void normalShellCmd()
                     {
                         boundCmdIdx = i;
                     }
-                    //testCmdPrint(cmd, cmdIdx);
+
                     inFileName = cmd[i + 1];
-                    //printf("inFileName: %s\n", inFileName);
                     int inFileFd = open(inFileName, O_RDONLY /*| O_CREAT*/);
                     fclose(stdin);
                     dup(inFileFd);
@@ -335,15 +296,15 @@ void normalShellCmd()
                     {
                         boundCmdIdx = i;
                     }
-                    //testCmdPrint(cmd, cmdIdx);
+
                     errFileName = cmd[i + 1];
-                    //printf("errFileName: %s\n", errFileName);
                     int errFileFd = open(errFileName, O_WRONLY | O_CREAT, 0644);
                     fclose(stderr);
                     dup(errFileFd);
                     close(errFileFd);
                 }
             }
+
             //>,<발생 시점부터 cmd배열 초기화 -> 쓸모있는 커맨드만 남김
             for (i = boundCmdIdx; i < cmdIdx && boundCmdIdx != -1; i++)
             {
@@ -352,7 +313,6 @@ void normalShellCmd()
 
             if (isBackGround == 1)
             {
-                //printf("백그라운드 작업!\n");
                 child_pid = fork();
                 if (child_pid == 0)
                 {
@@ -371,7 +331,6 @@ void normalShellCmd()
         }
         else
         {
-            //printf("parent로 복귀\n");
             waitpid(child_pid, &status, waitVal);
         }
     }
@@ -392,7 +351,6 @@ void cOptionShellCmd(char **argv)
     {
         memset(tmpCmd, 0, sizeof(tmpCmd));
         strcpy(tmpCmd, cmdPtr);
-        //printf("tmpCmd: %s   cmdPtr: %s\n", tmpCmd, cmdPtr);
 
         int child_pid = fork();
         if (child_pid == 0)
@@ -405,20 +363,12 @@ void cOptionShellCmd(char **argv)
         }
         cmdPtr = strtok(NULL, ";"); // 다음 문자열(string)을 잘라서 포인터를 반환
     }
-    //printf("-c 명령 종료!\n");
 }
 
 int main(int argc, char **argv)
 {
-    /*printf("argc: %d\n", argc);
-    int i;
-    for (i = 0; i < argc; i++)
-    {
-        printf("argv[%d]: %s\n", i, argv[i]);
-    }*/
     if (argc > 1 && (strcmp(argv[1], "-c") == 0))
     {
-        //printf("c옵션진입: %s\n", argv[1]);
         cOptionShellCmd(argv);
     }
     else
