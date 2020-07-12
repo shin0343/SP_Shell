@@ -2,7 +2,7 @@ My Shell in LINUX
 ====================
 
 - - -
-This is a C-based shell program that operates in a LINUX environment.
+This is a C-based shell program that operates in a LINUX environment. (not using system() function)
 > All commands are separated by 1 spacebar. <br>
 > Support "-c" option.<br>
 > Support Background Job (ex. Use "&" symbol such as "grep file &")<br>
